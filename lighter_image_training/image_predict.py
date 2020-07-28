@@ -29,5 +29,8 @@ test = np.array(test)
 model = load_model('Lighter.h5')
 predict = model.predict_classes(test)
  
-for i in range(len(test)):
-    print(name[i] + " : , Predict : "+ str(categories[predict[i]]))
+for i in range(len(predict)) :
+    print(predict[i])
+
+#for i in range(len(test)):
+    #print(name[i] + " : , Predict : "+ str(categories[predict[i]]))
