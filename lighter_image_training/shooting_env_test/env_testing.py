@@ -4,7 +4,7 @@ import numpy as np
 
 src = []
 name = []
-image_dir = "C:\\Users\\hyoj\\OneDrive\\Desktop\\lighter\\main\\lighter_image_training\\shooting_env_test\\image_sample\\"
+image_dir = "C:\\Users\\hyoj_\\OneDrive\\Desktop\\lighter\\main\\lighter_image_training\\shooting_env_test\\image_sample\\"
 
 def applyGrayScale(img) :
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -43,7 +43,7 @@ def applyFilter(img, flag) :
     return img
 
 for file in os.listdir(image_dir):
-    if (file.find('.png') is not -1):       
+    if (file.find('.jpg') is not -1):       
         src.append(image_dir + file)
         name.append(file)
 
@@ -54,15 +54,18 @@ for i in range(len(src)) :
 
     for j in range(16) :
         temp = j
-        flag = [temp/=8, temp/=4, temp/=2, temp/=1]
+        flag = []
+        for k in range(3, -1, -1) :
+            flag.append(int(temp/(2**k)))
+            temp %= (2**k)
         img = applyFilter(img, flag)
-        cv2.imwrite(filename[0]+'_'+str(j)+'.jpg', img)
+        cv2.imwrite(image_dir+str(j)+'\\'+filename[0]+'.jpg', img)
 
         img_canny = applyCanny(img)
-        cv2.imwrite(filename[0]+'_'+str(j)+'canny'+'.jpg', img_canny)
+        cv2.imwrite(image_dir+'canny'+'\\'+filename[0]+'_'+str(j)+'.jpg', img_canny)
 
         img_sobel = applySobel(img)
-        cv2.imwrite(filename[0]+'_'+str(j)+'sobel'+'.jpg', img_sobel)
+        cv2.imwrite(image_dir+'sobel'+'\\'+filename[0]+'_'+str(j)+'.jpg', img_sobel)
 
         img_laplacian = applyLaplacian(img)
-        cv2.imwrite(filename[0]+'_'+str(j)+'laplacian'+'.jpg', img_laplacian)
+        cv2.imwrite(image_dir+'laplacian'+'\\'+filename[0]+'_'+str(j)+'.jpg', img_laplacian)

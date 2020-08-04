@@ -17,7 +17,7 @@ def Dataization(img_path):
 src = []
 name = []
 test = []
-image_dir = "C:\\Users\\hyoj\\OneDrive\\Desktop\\lighter\\main\\lighter_image_training\\lighter_predict_smaple\\"
+image_dir = "C:\\Users\\hyoj_\\OneDrive\\Desktop\\lighter\\main\\lighter_image_training\\lighter_predict_smaple\\"
 for file in os.listdir(image_dir):
     if (file.find('.png') is not -1):       
         src.append(image_dir + file)
