@@ -25,7 +25,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # detect 결과
     outs = net.forward(output_layers)
 
-    lighters = 0
+    confidences = []
+    boxes = []
+
     for out in outs:
         for detection in out:
             scores = detection[5:]
@@ -33,11 +35,20 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             confidence = scores[class_id]
             # 신뢰도가 0.5 보다 크면 lighter로 카운트
             if confidence > 0.5:
-                lighters += 1
+                # Object detected
+                center_x = int(detection[0] * width)
+                center_y = int(detection[1] * height)
+                w = int(detection[2] * width)
+                h = int(detection[3] * height)
+                # 좌표
+                x = int(center_x - w / 2)
+                y = int(center_y - h / 2)
+                boxes.append([x, y, w, h])
+                confidences.append(float(confidence))
 
-    #indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+    indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
     # 카운트된 라이터가 5개 이상이면 캡쳐된 이미지 저장
-    if lighters >= 5 :
+    if len(indexes) >= 5 :
         cv2.imwrite(str(cap)+".png", img)
         cap += 1
