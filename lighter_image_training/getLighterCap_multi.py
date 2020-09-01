@@ -56,6 +56,7 @@ def yolo(cap) :
     gDrive = GDrive()
 
     net = cv2.dnn.readNet("yolov3-tiny_3000.weights", "yolov3-tiny.cfg")
+    os.chdir('images')
     classes = ["lighter"]
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
