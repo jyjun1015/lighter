@@ -45,16 +45,21 @@ class GDrive :
 def getCapture(cap) :
     with picamera.PiCamera() as camera :
         camera.resolution = (416, 416)
-        stream = io.BytesIO()
+        while True :
+            camera.capture("images/"+str(cap)+".jpg")
+            cap += 1
+            if cap > 30 :
+                return
+        """stream = io.BytesIO()
         
         for frame in camera.capture_continuous(stream, format="jpeg") :
-            data = np.fromstring(stream.getvalue(), dtype=np.uint8)
+            data = np.frombuffer(stream.getvalue(), dtype=np.uint8)
             img = cv2.imdecode(data, 1)
             cv2.imwrite("images/"+str(cap)+".jpg", img)
             cap += 1
 
             if cap > 30 :
-                return
+                return"""
 
 def yolo(cap) :
     gDrive = GDrive()

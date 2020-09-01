@@ -44,13 +44,16 @@ class GDrive :
 def getCapture(cap) :
     with picamera.PiCamera() as camera :
         camera.resolution = (416, 416)
-        stream = io.BytesIO()
+        while True :
+            camera.capture("images/"+str(cap)+".jpg")
+            cap += 1
+        """stream = io.BytesIO()
         
         for frame in camera.capture_continuous(stream, format="jpeg") :
             data = np.fromstring(stream.getvalue(), dtype=np.uint8)
             img = cv2.imdecode(data, 1)
             cv2.imwrite("images/"+str(cap)+".jpg", img)
-            cap += 1
+            cap += 1"""
 
 def yolo(cap) :
     gDrive = GDrive()
@@ -95,6 +98,7 @@ def yolo(cap) :
                 # 인식된 라이터가 다섯개 이상이면 업로드
                 if len(indexes) >= 5 :
                     gDrive.upload(str(cap)+".jpg")
+                    print("yolo")
 
                 # 처리가 끝난 이미지는 무조건 삭제
                 os.remove(str(cap)+".jpg")
