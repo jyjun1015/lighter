@@ -99,7 +99,6 @@ def yolo(cap) :
                 # 인식된 라이터가 다섯개 이상이면 업로드
                 if len(indexes) >= 5 :
                     gDrive.upload(str(cap)+".jpg")
-                    print("yolo")
 
                 # 처리가 끝난 이미지는 무조건 삭제
                 os.remove(str(cap)+".jpg")

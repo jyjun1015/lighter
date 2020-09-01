@@ -19,7 +19,6 @@ class GDrive :
 
         # 현재는 py파일과 client_secret_drive.json 파일이 모두 사진폴더에 있어야 함.
         # 이후 간단히 '.jpg' 확장자만 업로드할 수 있도록 바꿔주면 된다. 
-        os.chdir('C:\\Users\\cydph\\Desktop\\testUpload')       # 현재 디렉토리를 사진폴더로 변경
         SCOPES = 'https://www.googleapis.com/auth/drive.file'   # [변경X] Google API 사용 로그인 링크
         store = file.Storage('storage.json')                    # 현재 로그인된 드라이브 정보 로드.
         creds = store.get()                                     # storage.json 파일 가져온다.
@@ -40,7 +39,7 @@ class GDrive :
                     'mimeType': None                    # 데이터 타입은 아랫줄에서 결정.
                     }
 
-        res = DRIVE.files().create(body=metadata, media_body=filename).execute()
+        res = self.DRIVE.files().create(body=metadata, media_body=filename).execute()
 
 def getCapture(cap) :
     with picamera.PiCamera() as camera :
@@ -56,7 +55,7 @@ def getCapture(cap) :
 def yolo(cap) :
     gDrive = GDrive()
 
-    net = cv2.dnn.readNet("yolov3-tiny_3000.weights", "yolo3-tiny.cfg")
+    net = cv2.dnn.readNet("yolov3-tiny_3000.weights", "yolov3-tiny.cfg")
     classes = ["lighter"]
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
@@ -64,8 +63,8 @@ def yolo(cap) :
     prev = time.time()
     
     while True :
-        if os.path.isfile("images/"+str(cap)+".jpg") :
-            img = cv2.imread("images/"+str(cap)+".jpg")
+        if os.path.isfile(str(cap)+".jpg") :
+            img = cv2.imread(str(cap)+".jpg")
             try :
                 blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
                 net.setInput(blob)
@@ -97,7 +96,7 @@ def yolo(cap) :
                     gDrive.upload(str(cap)+".jpg")
 
                 # 처리가 끝난 이미지는 무조건 삭제
-                os.remove("images/"+str(cap)+".jpg")
+                os.remove(str(cap)+".jpg")
                 cap += 1
                 prev = time.time()
 
