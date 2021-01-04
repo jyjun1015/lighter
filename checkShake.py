@@ -2,15 +2,17 @@ import cv2
 import numpy as np
 from csi_camera import CSI_Camera
 
-DISPLAY_WIDTH = 640
-DISPLAY_HEIGHT = 360
-SENSOR_MODE = 3         # 1920x1080, 30fps: 2, 1280x720, 60fps: 3
+DISPLAY_WIDTH = 1024
+DISPLAY_HEIGHT = 576
+SENSOR_MODE = 2         # 1920x1080, 30fps: 2, 1280x720, 60fps: 3
 
 # Load YOLO
-net = cv2.dnn.readNet("yolov3-tiny-prn_6000.weights", "yolov3-tiny-prn.cfg")
+net = cv2.dnn.readNet(
+    "yolov3-tiny_4000.weights",
+    "yolov3-tiny.cfg")
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-classes = ["abnomal", "head", "nomal"]
+classes = ["nomal_head", "shake_head"]
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
@@ -30,12 +32,12 @@ def read_camera(csi_camera):
 def lighter_detect():
     camera = CSI_Camera()
     camera.create_gstreamer_pipeline(
-        sensor_id = 0,
-        sensor_mode = SENSOR_MODE,
-        framerate = 30,
-        flip_method = 0,
-        display_height = DISPLAY_HEIGHT,
-        display_width = DISPLAY_WIDTH,
+        sensor_id       = 0,
+        sensor_mode     = SENSOR_MODE,
+        framerate       = 30,
+        flip_method     = 0,
+        display_height  = DISPLAY_HEIGHT,
+        display_width   = DISPLAY_WIDTH,
     )
     camera.open(camera.gstreamer_pipeline)
     camera.start()
@@ -49,7 +51,7 @@ def lighter_detect():
         camera.start_counting_fps()
         while cv2.getWindowProperty("Lighter Test FPS", 0) >= 0:
             img = read_camera(camera)
-            blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+            blob = cv2.dnn.blobFromImage(img, 0.00392, (446, 446), (0, 0, 0), True, crop=False)
             net.setInput(blob)
             outs = net.forward(output_layers)
             
@@ -61,15 +63,17 @@ def lighter_detect():
                     scores = detection[5:]
                     class_id = np.argmax(scores)
                     confidence = scores[class_id]
-                    if confidence > 0.5:
+                    if confidence > 0.5 :
                         center_x = int(detection[0] * DISPLAY_WIDTH)
                         center_y = int(detection[1] * DISPLAY_HEIGHT)
                         w = int(detection[2] * DISPLAY_WIDTH)
                         h = int(detection[3] * DISPLAY_HEIGHT)
                         x = int(center_x - w / 2)
                         y = int(center_y - h / 2)
-                        cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 1, cv2.LINE_8)
-                        cv2.putText(img, classes[class_id], (x, y+30), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 1)
+                        if class_id == 0: cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2, cv2.LINE_AA)
+                        elif class_id == 1: cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2, cv2.LINE_AA)
+                        else: cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2, cv2.LINE_AA)
+                        cv2.putText(img, classes[class_id], (x, y+30), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
                         boxes.append([x, y, w, h])
                         confidences.append(float(confidence))
 
@@ -84,3 +88,4 @@ def lighter_detect():
 
 if __name__ == "__main__":
     lighter_detect()
+
